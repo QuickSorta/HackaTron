@@ -27,6 +27,9 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class MainActivity extends FragmentActivity implements
 
@@ -69,7 +72,6 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Firebase.setAndroidContext(this);
 
         setContentView(R.layout.fragment_main);
         // Create the LocationRequest object
@@ -88,7 +90,72 @@ public class MainActivity extends FragmentActivity implements
         mLocationClient = new LocationClient(this, this, this);
         longitudeView = (TextView) findViewById(R.id.longitude);
         latitudeView = (TextView) findViewById(R.id.latitude);
+
+        //initializing Firebase Context and instantiating object by referring it to my database
+        Firebase.setAndroidContext(this);
+        Firebase myFirebaseRef = new Firebase("https://dazzling-fire-2743.firebaseio.com/");
+        //function initializes User class and pushes users to database. Also handles location updates
+        createUsers(myFirebaseRef);
+        //function checks for updates to specific user's location and prints to the command line.
+
     }
+
+    //User class
+    public class User {
+
+        private String fullName;
+        private double latitude;
+        private double longitude;
+
+        public User() {}
+
+        public User(String fullName) {
+            this.fullName = fullName;
+            this.latitude = 0;
+            this.longitude = 0;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setLatitude(double updateLat) {
+            this.latitude = updateLat;
+        }
+
+        public void setLongitude(double updateLong) {
+            this.longitude = updateLong;
+        }
+        public String getFullName() {
+            return fullName;
+        }
+    }
+
+    //Initializes five users and pushes to database
+    public void createUsers(Firebase myFirebaseRef){
+        User nader_helmy = new User("Nader Helmy");
+        User simon_bloch = new User("Simon Bloch");
+        User michael_piazza = new User("Michael Piazza");
+        User miguel_gutierrez = new User("Miguel Guitierrez");
+        User dylan_jeffers = new User("Miguel Guitierrez");
+
+        Firebase usersRef = myFirebaseRef.child("users");
+
+        Map<String, User> users = new HashMap<String, User>();
+        users.put("User1", nader_helmy);
+        users.put("User2", simon_bloch);
+        users.put("User3", michael_piazza);
+        users.put("User4", miguel_gutierrez);
+        users.put("User5", dylan_jeffers);
+
+        usersRef.setValue(users);
+    }
+
+
     public void onLocationChanged(Location location){
 //        String msg = "Updated Location: " +
 //                Double.toString(location.getLatitude()) + "," +
@@ -96,10 +163,11 @@ public class MainActivity extends FragmentActivity implements
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-        sendToStrangers();
+       // usersRef.child("User2/longitude").setValue(simon_bloch.getLongitude()
+        sentToStrangers();
     }
 
-    public void sendToStrangers() {
+    public void sentToStrangers() {
             if (!sentToStrangers && (latitude != 0)) {
                 sentToStrangers = true;
                 //send to firebase
@@ -119,7 +187,7 @@ public class MainActivity extends FragmentActivity implements
 
         longitudeView.setText(String.valueOf(longitude));
         latitudeView.setText(String.valueOf(latitude));
-        sendToStrangers();
+        sentToStrangers();
     }
 
 
