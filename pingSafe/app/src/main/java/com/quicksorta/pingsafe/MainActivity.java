@@ -21,6 +21,7 @@ import android.os.Build;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -68,6 +69,8 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
+
         setContentView(R.layout.fragment_main);
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create();
@@ -85,7 +88,6 @@ public class MainActivity extends FragmentActivity implements
         mLocationClient = new LocationClient(this, this, this);
         longitudeView = (TextView) findViewById(R.id.longitude);
         latitudeView = (TextView) findViewById(R.id.latitude);
-
     }
     public void onLocationChanged(Location location){
 //        String msg = "Updated Location: " +
