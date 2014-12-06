@@ -54,10 +54,12 @@ public class MainActivity extends FragmentActivity implements
     // A fast frequency ceiling in milliseconds
     private static final long FASTEST_INTERVAL =
             MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    private double latitude=0, longitude=0;
 
     LocationClient mLocationClient;
     boolean mUpdatesRequested;
-    Location mCurrentLocation;
+    TextView longitudeView;
+    TextView latitudeView;
 
     // Define an object that holds accuracy and frequency parameters
     LocationRequest mLocationRequest;
@@ -80,32 +82,28 @@ public class MainActivity extends FragmentActivity implements
          * handle callbacks.
          */
         mLocationClient = new LocationClient(this, this, this);
+        longitudeView = (TextView) findViewById(R.id.longitude);
+        latitudeView = (TextView) findViewById(R.id.latitude);
+
     }
     public void onLocationChanged(Location location){
-//        double longitude = mCurrentLocation.getLongitude();
-//        double latitude = mCurrentLocation.getLatitude();
-//
-//        TextView longitudeView = (TextView) findViewById(R.id.longitude);
-//        TextView latitudeView = (TextView) findViewById(R.id.latitude);
-//
-//        longitudeView.setText(String.valueOf(longitude));
-//        latitudeView.setText(String.valueOf(latitude));
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+//        String msg = "Updated Location: " +
+//                Double.toString(location.getLatitude()) + "," +
+//                Double.toString(location.getLongitude());
+//        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
     }
     public void sendLocation(View view){
 //        mCurrentLocation = mLocationClient.getLastLocation();
 //        double longitude = mCurrentLocation.getLongitude();
 //        double latitude = mCurrentLocation.getLatitude();
-//
-//        TextView longitudeView = (TextView) findViewById(R.id.longitude);
-//        TextView latitudeView = (TextView) findViewById(R.id.latitude);
-//
-//        longitudeView.setText(String.valueOf(longitude));
-//        latitudeView.setText(String.valueOf(latitude));
-          mLocationClient.connect();
+        if(!mUpdatesRequested) {
+            mLocationClient.connect();
+            mUpdatesRequested = true;
+        }
+        longitudeView.setText(String.valueOf(longitude));
+        latitudeView.setText(String.valueOf(latitude));
 
     }
     /*
