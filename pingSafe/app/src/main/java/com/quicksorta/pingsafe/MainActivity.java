@@ -91,6 +91,7 @@ public class MainActivity extends FragmentActivity implements
          * handle callbacks.
          */
         mLocationClient = new LocationClient(this, this, this);
+        mLocationClient.connect();
         longitudeView = (TextView) findViewById(R.id.longitude);
         latitudeView = (TextView) findViewById(R.id.latitude);
 
@@ -117,6 +118,7 @@ public class MainActivity extends FragmentActivity implements
         private double latitude;
         private double longitude;
         private String userNameID;
+        private boolean ping;
 
         public User() {}
 
@@ -124,8 +126,12 @@ public class MainActivity extends FragmentActivity implements
             this.fullName = fullName;
             this.latitude = 0;
             this.longitude = 0;
+            this.ping = false;
         }
-
+        public void setPing(Boolean pingBool){
+            this.ping = pingBool;
+        }
+        public boolean getPing(){ return ping; }
         public double getLatitude() {
             return latitude;
         }
@@ -169,6 +175,7 @@ public class MainActivity extends FragmentActivity implements
         selfUser.setLongitude(location.getLongitude());
         usersRef.child(selfUser.getUserNameID()+"/latitude").setValue(selfUser.getLatitude());
         usersRef.child(selfUser.getUserNameID()+"/longitude").setValue(selfUser.getLongitude());
+
         Toast.makeText(this, "Updated latitude: " + Double.toString(selfUser.getLatitude()), Toast.LENGTH_SHORT).show();
 //        sentToStrangers();
     }
@@ -185,14 +192,16 @@ public class MainActivity extends FragmentActivity implements
 //        mCurrentLocation = mLocationClient.getLastLocation();
 //        double longitude = mCurrentLocation.getLongitude();
 //        double latitude = mCurrentLocation.getLatitude();
-        if(!mUpdatesRequested) {
-
-            mLocationClient.connect();
-            mUpdatesRequested = true;
-        }
+//        if(!mUpdatesRequested) {
+//
+////            mLocationClient.connect();
+//            mUpdatesRequested = true;
+//        }
 
         longitudeView.setText(String.valueOf(selfUser.getLongitude()));
         latitudeView.setText(String.valueOf(selfUser.getLatitude()));
+        selfUser.setPing(true);
+        usersRef.child(selfUser.getUserNameID()+"/ping").setValue(selfUser.getPing());
 //        sentToStrangers();
     }
 
