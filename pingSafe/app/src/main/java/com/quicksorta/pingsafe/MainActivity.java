@@ -21,7 +21,10 @@ import android.os.Build;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
@@ -110,7 +113,18 @@ public class MainActivity extends FragmentActivity implements
         selfUser.setUserNameID(newUsersRef.getKey());
         //function initializes User class and pushes users to database. Also handles location updates
 
+        newUsersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Context context = getApplicationContext();
+                Toast.makeText(context, "Ping received !", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
         //function checks for updates to specific user's location and prints to the command line.
 
     }
@@ -177,8 +191,8 @@ public class MainActivity extends FragmentActivity implements
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         selfUser.setLatitude(location.getLatitude());
         selfUser.setLongitude(location.getLongitude());
-        usersRef.child(selfUser.getUserNameID()+"/latitude").setValue(selfUser.getLatitude());
-        usersRef.child(selfUser.getUserNameID()+"/longitude").setValue(selfUser.getLongitude());
+//        usersRef.child(selfUser.getUserNameID()+"/latitude").setValue(selfUser.getLatitude());
+//        usersRef.child(selfUser.getUserNameID()+"/longitude").setValue(selfUser.getLongitude());
         geoFire.setLocation(selfUser.getUserNameID(), new GeoLocation(selfUser.getLatitude(), selfUser.getLongitude()));
 
         Toast.makeText(this, "Updated latitude: " + Double.toString(selfUser.getLatitude()), Toast.LENGTH_SHORT).show();
