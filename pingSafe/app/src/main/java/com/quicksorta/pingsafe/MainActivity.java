@@ -22,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.Firebase;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -67,6 +69,7 @@ public class MainActivity extends FragmentActivity implements
     User selfUser;
     Firebase myFirebaseRef;
     Firebase usersRef;
+    GeoFire geoFire;
 
 
     // Define an object that holds accuracy and frequency parameters
@@ -98,6 +101,7 @@ public class MainActivity extends FragmentActivity implements
         //initializing Firebase Context and instantiating object by referring it to my database
         Firebase.setAndroidContext(this);
         myFirebaseRef = new Firebase("https://dazzling-fire-2743.firebaseio.com/");
+        geoFire = new GeoFire(myFirebaseRef);
         usersRef = myFirebaseRef.child("users");
         Firebase newUsersRef = usersRef.push();
         selfUser = new User("Simon Bloch");
@@ -175,6 +179,7 @@ public class MainActivity extends FragmentActivity implements
         selfUser.setLongitude(location.getLongitude());
         usersRef.child(selfUser.getUserNameID()+"/latitude").setValue(selfUser.getLatitude());
         usersRef.child(selfUser.getUserNameID()+"/longitude").setValue(selfUser.getLongitude());
+        geoFire.setLocation(selfUser.getUserNameID(), new GeoLocation(selfUser.getLatitude(), selfUser.getLongitude()));
 
         Toast.makeText(this, "Updated latitude: " + Double.toString(selfUser.getLatitude()), Toast.LENGTH_SHORT).show();
 //        sentToStrangers();
