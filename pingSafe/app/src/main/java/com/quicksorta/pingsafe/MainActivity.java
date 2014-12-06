@@ -58,13 +58,16 @@ public class MainActivity extends FragmentActivity implements
     // A fast frequency ceiling in milliseconds
     private static final long FASTEST_INTERVAL =
             MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
-    private double latitude=0, longitude=0;
 
     LocationClient mLocationClient;
     boolean mUpdatesRequested;
     boolean sentToStrangers = false;
     TextView longitudeView;
     TextView latitudeView;
+    User selfUser;
+    Firebase myFirebaseRef;
+    Firebase usersRef;
+
 
     // Define an object that holds accuracy and frequency parameters
     LocationRequest mLocationRequest;
@@ -93,9 +96,16 @@ public class MainActivity extends FragmentActivity implements
 
         //initializing Firebase Context and instantiating object by referring it to my database
         Firebase.setAndroidContext(this);
-        Firebase myFirebaseRef = new Firebase("https://dazzling-fire-2743.firebaseio.com/");
+        myFirebaseRef = new Firebase("https://dazzling-fire-2743.firebaseio.com/");
+        usersRef = myFirebaseRef.child("users");
+        Firebase newUsersRef = usersRef.push();
+        selfUser = new User("Simon Bloch");
+
+        newUsersRef.setValue(selfUser);
+        selfUser.setUserNameID(newUsersRef.getKey());
         //function initializes User class and pushes users to database. Also handles location updates
-        createUsers(myFirebaseRef);
+
+
         //function checks for updates to specific user's location and prints to the command line.
 
     }
@@ -106,6 +116,7 @@ public class MainActivity extends FragmentActivity implements
         private String fullName;
         private double latitude;
         private double longitude;
+        private String userNameID;
 
         public User() {}
 
@@ -123,6 +134,10 @@ public class MainActivity extends FragmentActivity implements
             return longitude;
         }
 
+        public String getUserNameID() { return userNameID; }
+        public void setUserNameID(String ID) {
+            userNameID = ID; }
+
         public void setLatitude(double updateLat) {
             this.latitude = updateLat;
         }
@@ -137,21 +152,10 @@ public class MainActivity extends FragmentActivity implements
 
     //Initializes five users and pushes to database
     public void createUsers(Firebase myFirebaseRef){
-        User nader_helmy = new User("Nader Helmy");
         User simon_bloch = new User("Simon Bloch");
-        User michael_piazza = new User("Michael Piazza");
-        User miguel_gutierrez = new User("Miguel Guitierrez");
-        User dylan_jeffers = new User("Miguel Guitierrez");
-
         Firebase usersRef = myFirebaseRef.child("users");
-
         Map<String, User> users = new HashMap<String, User>();
-        users.put("User1", nader_helmy);
         users.put("User2", simon_bloch);
-        users.put("User3", michael_piazza);
-        users.put("User4", miguel_gutierrez);
-        users.put("User5", dylan_jeffers);
-
         usersRef.setValue(users);
     }
 
@@ -161,19 +165,21 @@ public class MainActivity extends FragmentActivity implements
 //                Double.toString(location.getLatitude()) + "," +
 //                Double.toString(location.getLongitude());
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-       // usersRef.child("User2/longitude").setValue(simon_bloch.getLongitude()
-        sentToStrangers();
+        selfUser.setLatitude(location.getLatitude());
+        selfUser.setLongitude(location.getLongitude());
+        usersRef.child(selfUser.getUserNameID()+"/latitude").setValue(selfUser.getLatitude());
+        usersRef.child(selfUser.getUserNameID()+"/longitude").setValue(selfUser.getLongitude());
+        Toast.makeText(this, "Updated latitude: " + Double.toString(selfUser.getLatitude()), Toast.LENGTH_SHORT).show();
+//        sentToStrangers();
     }
 
-    public void sentToStrangers() {
-            if (!sentToStrangers && (latitude != 0)) {
-                sentToStrangers = true;
-                //send to firebase
-                Toast.makeText(this, "Sent to strangers: " + Double.toString(latitude), Toast.LENGTH_SHORT).show();
-            }
-    }
+//    public void sentToStrangers() {
+//            if (!sentToStrangers && (selfUser.getLatitude() != 0)) {
+//                sentToStrangers = true;
+//                //send to firebase
+//                Toast.makeText(this, "Sent to strangers: " + Double.toString(selfUser.getLatitude()), Toast.LENGTH_SHORT).show();
+//            }
+//    }
 
     public void sendLocation(View view){
 //        mCurrentLocation = mLocationClient.getLastLocation();
@@ -185,9 +191,9 @@ public class MainActivity extends FragmentActivity implements
             mUpdatesRequested = true;
         }
 
-        longitudeView.setText(String.valueOf(longitude));
-        latitudeView.setText(String.valueOf(latitude));
-        sentToStrangers();
+        longitudeView.setText(String.valueOf(selfUser.getLongitude()));
+        latitudeView.setText(String.valueOf(selfUser.getLatitude()));
+//        sentToStrangers();
     }
 
 
