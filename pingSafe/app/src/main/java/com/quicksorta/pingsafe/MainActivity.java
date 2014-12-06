@@ -58,6 +58,7 @@ public class MainActivity extends FragmentActivity implements
 
     LocationClient mLocationClient;
     boolean mUpdatesRequested;
+    boolean sentToStrangers = false;
     TextView longitudeView;
     TextView latitudeView;
 
@@ -93,19 +94,34 @@ public class MainActivity extends FragmentActivity implements
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         latitude = location.getLatitude();
         longitude = location.getLongitude();
+        sendToStrangers();
     }
+
+    public void sendToStrangers() {
+            if (!sentToStrangers && (latitude != 0)) {
+                sentToStrangers = true;
+                //send to firebase
+                Toast.makeText(this, "Sent to strangers: " + Double.toString(latitude), Toast.LENGTH_SHORT).show();
+            }
+    }
+
     public void sendLocation(View view){
 //        mCurrentLocation = mLocationClient.getLastLocation();
 //        double longitude = mCurrentLocation.getLongitude();
 //        double latitude = mCurrentLocation.getLatitude();
         if(!mUpdatesRequested) {
+
             mLocationClient.connect();
             mUpdatesRequested = true;
         }
+
         longitudeView.setText(String.valueOf(longitude));
         latitudeView.setText(String.valueOf(latitude));
-
+        sendToStrangers();
     }
+
+
+
     /*
      * Called when the Activity becomes visible.
      */
