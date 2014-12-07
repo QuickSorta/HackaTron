@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
@@ -26,6 +27,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.*;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 public class MainActivity extends FragmentActivity implements
@@ -66,10 +72,26 @@ public class MainActivity extends FragmentActivity implements
     // Define an object that holds accuracy and frequency parameters
     LocationRequest mLocationRequest;
 
+    //user that holds coordinates and name
+    User user;
+    Firebase myFirebaseRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //create and initialize Firebase
         Firebase.setAndroidContext(this);
+
+        myFirebaseRef = new Firebase("https://scorching-inferno-2497.firebaseio.com/");
+        Firebase hopperRef = myFirebaseRef.child("users");
+
+        Map<String, Object> users = new HashMap<String, Object>();
+        user = new User("Michael1234");
+        users.put(user.getFullName(), user);
+
+        hopperRef.updateChildren(users);
+
 
         setContentView(R.layout.fragment_main);
         // Create the LocationRequest object
@@ -89,6 +111,39 @@ public class MainActivity extends FragmentActivity implements
         longitudeView = (TextView) findViewById(R.id.longitude);
         latitudeView = (TextView) findViewById(R.id.latitude);
     }
+    public class User extends Object{
+
+        private String fullName;
+        private double latitude;
+        private double longitude;
+
+        public User() {}
+
+        public User(String fullName) {
+            this.fullName = fullName;
+            this.latitude = 0;
+            this.longitude = 0;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setLatitude(double updateLat) {
+            this.latitude = updateLat;
+        }
+
+        public void setLongitude(double updateLong) {
+            this.longitude = updateLong;
+        }
+        public String getFullName() {
+            return fullName;
+        }
+    }
     public void onLocationChanged(Location location){
 //        String msg = "Updated Location: " +
 //                Double.toString(location.getLatitude()) + "," +
@@ -96,6 +151,10 @@ public class MainActivity extends FragmentActivity implements
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         latitude = location.getLatitude();
         longitude = location.getLongitude();
+        user.setLatitude(latitude);
+        user.setLongitude(longitude);
+        myFirebaseRef.child("users").child(user.getFullName()).child("latitude").setValue(latitude);
+        myFirebaseRef.child("users").child(user.getFullName()).child("longitude").setValue(longitude);
         sendToStrangers();
     }
 
@@ -309,9 +368,6 @@ public class MainActivity extends FragmentActivity implements
              * user with the error.
              */
             showErrorDialog(connectionResult.getErrorCode());
-
-
-
         }
     }
 }

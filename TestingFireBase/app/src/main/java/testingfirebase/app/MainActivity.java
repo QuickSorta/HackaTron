@@ -23,7 +23,7 @@ public class MainActivity extends ActionBarActivity {
 
         //initializing Firebase Context and instantiating object by referring it to my database
         Firebase.setAndroidContext(this);
-        Firebase myFirebaseRef = new Firebase("https://dazzling-fire-2743.firebaseio.com/");
+        Firebase myFirebaseRef = new Firebase("https://scorching-inferno-2497.firebaseio.com/");
         //function initializes User class and pushes users to database. Also handles location updates
         createUsers(myFirebaseRef);
         //function checks for updates to specific user's location and prints to the command line.
@@ -105,6 +105,7 @@ public class MainActivity extends ActionBarActivity {
 
         simon_bloch.setLatitude(46.00029238434);
         simon_bloch.setLongitude(24.23904857539);
+
         usersRef.child("User2/latitude").setValue(simon_bloch.getLatitude());
         usersRef.child("User2/longitude").setValue(simon_bloch.getLongitude());
     }
