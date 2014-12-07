@@ -23,11 +23,26 @@ public class MainActivity extends ActionBarActivity {
 
         //initializing Firebase Context and instantiating object by referring it to my database
         Firebase.setAndroidContext(this);
+<<<<<<< HEAD
         Firebase myFirebaseRef = new Firebase("https://scorching-inferno-2497.firebaseio.com/");
+=======
+        Firebase myFirebaseRef = new Firebase("https://dazzling-fire-2743.firebaseio.com/");
+
+        myFirebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+>>>>>>> origin/master
         //function initializes User class and pushes users to database. Also handles location updates
         createUsers(myFirebaseRef);
         //function checks for updates to specific user's location and prints to the command line.
-        checkForUpdates(myFirebaseRef);
+       // checkForUpdates(myFirebaseRef);
     }
 
     //User class
@@ -90,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
         User simon_bloch = new User("Simon Bloch");
         User michael_piazza = new User("Michael Piazza");
         User miguel_gutierrez = new User("Miguel Guitierrez");
-        User dylan_jeffers = new User("Miguel Guitierrez");
+        User dylan_jeffers = new User("Dylan Jeffers");
 
         Firebase usersRef = myFirebaseRef.child("users");
 
@@ -101,13 +116,45 @@ public class MainActivity extends ActionBarActivity {
         users.put("User4", miguel_gutierrez);
         users.put("User5", dylan_jeffers);
 
-        usersRef.setValue(users);
+        usersRef.setValue(users, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    System.out.println("Data could not be saved. " + firebaseError.getMessage());
+                } else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
 
         simon_bloch.setLatitude(46.00029238434);
         simon_bloch.setLongitude(24.23904857539);
+<<<<<<< HEAD
 
         usersRef.child("User2/latitude").setValue(simon_bloch.getLatitude());
         usersRef.child("User2/longitude").setValue(simon_bloch.getLongitude());
+=======
+        usersRef.child("User2/latitude").setValue(simon_bloch.getLatitude(),  new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    System.out.println("Data could not be saved. " + firebaseError.getMessage());
+                } else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
+        usersRef.child("User2/longitude").setValue(simon_bloch.getLongitude(),  new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    System.out.println("Data could not be saved. " + firebaseError.getMessage());
+                } else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
+>>>>>>> origin/master
     }
 
     //checks for updates to User2's location

@@ -22,16 +22,26 @@ import android.os.Build;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.*;
 
+<<<<<<< HEAD
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+=======
+import java.util.HashMap;
+import java.util.Map;
+>>>>>>> origin/master
 
 
 public class MainActivity extends FragmentActivity implements
@@ -61,13 +71,17 @@ public class MainActivity extends FragmentActivity implements
     // A fast frequency ceiling in milliseconds
     private static final long FASTEST_INTERVAL =
             MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
-    private double latitude=0, longitude=0;
 
     LocationClient mLocationClient;
     boolean mUpdatesRequested;
     boolean sentToStrangers = false;
     TextView longitudeView;
     TextView latitudeView;
+    User selfUser;
+    Firebase myFirebaseRef;
+    Firebase usersRef;
+    GeoFire geoFire;
+
 
     // Define an object that holds accuracy and frequency parameters
     LocationRequest mLocationRequest;
@@ -79,9 +93,12 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+<<<<<<< HEAD
 
         //create and initialize Firebase
         Firebase.setAndroidContext(this);
+=======
+>>>>>>> origin/master
 
         myFirebaseRef = new Firebase("https://scorching-inferno-2497.firebaseio.com/");
         Firebase hopperRef = myFirebaseRef.child("users");
@@ -108,14 +125,53 @@ public class MainActivity extends FragmentActivity implements
          * handle callbacks.
          */
         mLocationClient = new LocationClient(this, this, this);
+        mLocationClient.connect();
         longitudeView = (TextView) findViewById(R.id.longitude);
         latitudeView = (TextView) findViewById(R.id.latitude);
+
+        //initializing Firebase Context and instantiating object by referring it to my database
+        Firebase.setAndroidContext(this);
+        myFirebaseRef = new Firebase("https://dazzling-fire-2743.firebaseio.com/");
+        geoFire = new GeoFire(myFirebaseRef);
+        usersRef = myFirebaseRef.child("users");
+        Firebase newUsersRef = usersRef.push();
+        selfUser = new User("Simon Bloch");
+
+        usersRef.setValue(selfUser);
+        selfUser.setUserNameID(newUsersRef.getKey());
+        //function initializes User class and pushes users to database. Also handles location updates
+
+        usersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Context context = getApplicationContext();
+                Toast.makeText(context, "Ping received !", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+        //function checks for updates to specific user's location and prints to the command line.
+
     }
+<<<<<<< HEAD
     public class User extends Object{
+=======
+
+    //User class
+    public class User {
+>>>>>>> origin/master
 
         private String fullName;
         private double latitude;
         private double longitude;
+<<<<<<< HEAD
+=======
+        private String userNameID;
+        private boolean ping;
+>>>>>>> origin/master
 
         public User() {}
 
@@ -123,8 +179,17 @@ public class MainActivity extends FragmentActivity implements
             this.fullName = fullName;
             this.latitude = 0;
             this.longitude = 0;
+<<<<<<< HEAD
         }
 
+=======
+            this.ping = false;
+        }
+        public void setPing(Boolean pingBool){
+            this.ping = pingBool;
+        }
+        public boolean getPing(){ return ping; }
+>>>>>>> origin/master
         public double getLatitude() {
             return latitude;
         }
@@ -133,6 +198,13 @@ public class MainActivity extends FragmentActivity implements
             return longitude;
         }
 
+<<<<<<< HEAD
+=======
+        public String getUserNameID() { return userNameID; }
+        public void setUserNameID(String ID) {
+            userNameID = ID; }
+
+>>>>>>> origin/master
         public void setLatitude(double updateLat) {
             this.latitude = updateLat;
         }
@@ -144,11 +216,26 @@ public class MainActivity extends FragmentActivity implements
             return fullName;
         }
     }
+<<<<<<< HEAD
+=======
+
+    //Initializes five users and pushes to database
+    public void createUsers(Firebase myFirebaseRef){
+        User simon_bloch = new User("Simon Bloch");
+        Firebase usersRef = myFirebaseRef.child("users");
+        Map<String, User> users = new HashMap<String, User>();
+        users.put("User2", simon_bloch);
+        usersRef.setValue(users);
+    }
+
+
+>>>>>>> origin/master
     public void onLocationChanged(Location location){
 //        String msg = "Updated Location: " +
 //                Double.toString(location.getLatitude()) + "," +
 //                Double.toString(location.getLongitude());
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+<<<<<<< HEAD
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         user.setLatitude(latitude);
@@ -156,29 +243,41 @@ public class MainActivity extends FragmentActivity implements
         myFirebaseRef.child("users").child(user.getFullName()).child("latitude").setValue(latitude);
         myFirebaseRef.child("users").child(user.getFullName()).child("longitude").setValue(longitude);
         sendToStrangers();
+=======
+        selfUser.setLatitude(location.getLatitude());
+        selfUser.setLongitude(location.getLongitude());
+//        usersRef.child(selfUser.getUserNameID()+"/latitude").setValue(selfUser.getLatitude());
+//        usersRef.child(selfUser.getUserNameID()+"/longitude").setValue(selfUser.getLongitude());
+        geoFire.setLocation(selfUser.getUserNameID(), new GeoLocation(selfUser.getLatitude(), selfUser.getLongitude()));
+
+        Toast.makeText(this, "Updated latitude: " + Double.toString(selfUser.getLatitude()), Toast.LENGTH_SHORT).show();
+//        sentToStrangers();
+>>>>>>> origin/master
     }
 
-    public void sendToStrangers() {
-            if (!sentToStrangers && (latitude != 0)) {
-                sentToStrangers = true;
-                //send to firebase
-                Toast.makeText(this, "Sent to strangers: " + Double.toString(latitude), Toast.LENGTH_SHORT).show();
-            }
-    }
+//    public void sentToStrangers() {
+//            if (!sentToStrangers && (selfUser.getLatitude() != 0)) {
+//                sentToStrangers = true;
+//                //send to firebase
+//                Toast.makeText(this, "Sent to strangers: " + Double.toString(selfUser.getLatitude()), Toast.LENGTH_SHORT).show();
+//            }
+//    }
 
     public void sendLocation(View view){
 //        mCurrentLocation = mLocationClient.getLastLocation();
 //        double longitude = mCurrentLocation.getLongitude();
 //        double latitude = mCurrentLocation.getLatitude();
-        if(!mUpdatesRequested) {
+//        if(!mUpdatesRequested) {
+//
+////            mLocationClient.connect();
+//            mUpdatesRequested = true;
+//        }
 
-            mLocationClient.connect();
-            mUpdatesRequested = true;
-        }
-
-        longitudeView.setText(String.valueOf(longitude));
-        latitudeView.setText(String.valueOf(latitude));
-        sendToStrangers();
+        longitudeView.setText(String.valueOf(selfUser.getLongitude()));
+        latitudeView.setText(String.valueOf(selfUser.getLatitude()));
+        selfUser.setPing(true);
+        usersRef.child(selfUser.getUserNameID()+"/ping").setValue(selfUser.getPing());
+//        sentToStrangers();
     }
 
 
