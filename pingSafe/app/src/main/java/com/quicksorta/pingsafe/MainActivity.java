@@ -135,13 +135,13 @@ public class MainActivity extends FragmentActivity implements
         geoFire = new GeoFire(myFirebaseRef);
         usersRef = myFirebaseRef.child("users");
         Firebase newUsersRef = usersRef.push();
-        selfUser = new User("Simon Bloch");
+        selfUser = new User("Kanye West");
 
-        newUsersRef.setValue(selfUser);
+        usersRef.setValue(selfUser);
         selfUser.setUserNameID(newUsersRef.getKey());
         //function initializes User class and pushes users to database. Also handles location updates
 
-        newUsersRef.addValueEventListener(new ValueEventListener() {
+        usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Context context = getApplicationContext();
