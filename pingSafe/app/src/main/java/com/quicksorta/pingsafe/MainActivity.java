@@ -109,11 +109,11 @@ public class MainActivity extends FragmentActivity implements
         Firebase newUsersRef = usersRef.push();
         selfUser = new User("Simon Bloch");
 
-        newUsersRef.setValue(selfUser);
+        usersRef.setValue(selfUser);
         selfUser.setUserNameID(newUsersRef.getKey());
         //function initializes User class and pushes users to database. Also handles location updates
 
-        newUsersRef.addValueEventListener(new ValueEventListener() {
+        usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Context context = getApplicationContext();
